@@ -8,9 +8,10 @@ host = 'localhost'
 port = '5432'
 
 query_1 = '''
-select Animation_studio.name, sum(Anime.members) as mem_sum
-from Animation_studio join Anime on Animation_studio.studio_id = Anime.studio_id
-group by Animation_studio.name;
+select Anime_genre.genre, count(Anime.anime_id) as anim_count from Anime_genre
+join Anime on Anime_genre.anime_id = Anime.anime_id
+group by Anime_genre.genre
+order by anim_count desc;
 '''
 query_2 = '''
 select Anime.rating, count(Anime_genre.genre) as genre_count from Anime
@@ -25,28 +26,28 @@ with conn:
     cur = conn.cursor()
 
     cur.execute(query_1)
-    anim_studio = []
+    anim_genre = []
     total = []
 
     for row in cur:
-        anim_studio.append(row[0])
+        anim_genre.append(row[0])
         total.append(row[1])
 
-    x_range = range(len(anim_studio))
+    x_range = range(len(anim_genre))
 
     figure, (bar_ax, pie_ax, graph_ax) = plt.subplots(1, 3)
     bar = bar_ax.bar(x_range, total, label='Total')
-    bar_ax.bar_label(bar, label_type='center', fmt='%d', rotation=90)
+    bar_ax.bar_label(bar, label_type='center', fmt='%d')
     bar_ax.set_xticks(x_range)
-    bar_ax.set_xticklabels(anim_studio, rotation=27)
-    bar_ax.set_xlabel('Студії анімації')
+    bar_ax.set_xticklabels(anim_genre, rotation=90)
+    bar_ax.set_xlabel('Назви жанрів')
     bar_ax.set_yticks(bar_ax.get_yticks())
     bar_ax.set_yticklabels(str(int(float(label))) for label in bar_ax.get_yticks())
-    bar_ax.set_ylabel('Фанати, осіб')
-    bar_ax.set_title('Кількість фанатів аніме в залежності від студії')
+    bar_ax.set_ylabel('Кількість, шт.')
+    bar_ax.set_title('Кількість аніме, що належать до жанрів')
 
-    pie_ax.pie(total, labels=anim_studio, autopct='%1.01f%%')
-    pie_ax.set_title('Частка фанатів кожної студії')
+    pie_ax.pie(total, labels=anim_genre, autopct='%1.01f%%')
+    pie_ax.set_title('Частка аніме кожного жанру')
 
     cur.execute(query_2)
     count = []

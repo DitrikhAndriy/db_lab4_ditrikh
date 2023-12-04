@@ -1,10 +1,10 @@
--- 1. Вивести кількість фанатів кожного аніме в залежності від студії анімації
--- 2. Вивести розподіл частки фанатів кожної студії
-select Animation_studio.name, sum(Anime.members) as mem_sum
-from Animation_studio join Anime on Animation_studio.studio_id = Anime.studio_id
-group by Animation_studio.name;
+-- 1, 2. Вивести назви жанрів аніме, й кількість аніме що до них належать
+select Anime_genre.genre, count(Anime.anime_id) as anim_count from Anime_genre
+join Anime on Anime_genre.anime_id = Anime.anime_id
+group by Anime_genre.genre
+order by anim_count desc;
 
--- 3. Вивести графік залежності рейтингу аніме від кількості його жанрів
+-- 3. Вивести рейтинг аніме, й кількість жанрів що має аніме з таким рейтингом
 select Anime.rating, count(Anime_genre.genre) as genre_count from Anime
 join Anime_genre on Anime.anime_id = Anime_genre.anime_id
 group by Anime.rating

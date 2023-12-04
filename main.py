@@ -8,9 +8,10 @@ host = 'localhost'
 port = '5432'
 
 query_1 = '''
-select Animation_studio.name, sum(Anime.members) as mem_sum
-from Animation_studio join Anime on Animation_studio.studio_id = Anime.studio_id
-group by Animation_studio.name;
+select Anime_genre.genre, count(Anime.anime_id) as anim_count from Anime_genre
+join Anime on Anime_genre.anime_id = Anime.anime_id
+group by Anime_genre.genre
+order by anim_count desc;
 '''
 query_2 = '''
 select Anime.rating, count(Anime_genre.genre) as genre_count from Anime
@@ -25,17 +26,17 @@ with conn:
     cur = conn.cursor()
 
     cur.execute(query_1)
-    anim_studio = []
+    anim_genre = []
     total = []
 
     for row in cur:
         print(row)
-        anim_studio.append(row[0])
+        anim_genre.append(row[0])
         total.append(row[1])
 
     print()
-    for i in range(len(anim_studio)):
-        print(f"{anim_studio[i]} {100*total[i]/sum(total):1.01f}%")
+    for i in range(len(anim_genre)):
+        print(f"{anim_genre[i]} {100*total[i]/sum(total):1.01f}%")
 
     cur.execute(query_2)
     count = []
