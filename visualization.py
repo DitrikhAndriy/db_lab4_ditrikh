@@ -14,10 +14,14 @@ group by Anime_genre.genre
 order by anim_count desc;
 '''
 query_2 = '''
-select Anime.rating, count(Anime_genre.genre) as genre_count from Anime
+select avg(rating), genre_count
+from
+(select Anime.rating, count(Anime_genre.genre) as genre_count from Anime
 join Anime_genre on Anime.anime_id = Anime_genre.anime_id
 group by Anime.rating
-order by genre_count desc;
+order by genre_count desc) as subquery
+group by genre_count
+order by genre_count;
 '''
 
 conn = psycopg2.connect(user=username, password=password, dbname=database, host=host, port=port)
@@ -65,7 +69,7 @@ with conn:
 
     graph_ax.set_xlabel('Кількість жанрів')
     graph_ax.set_ylabel('Рейтинг')
-    graph_ax.set_title('Графік залежності рейтингу аніме від кількості його жанрів')
+    graph_ax.set_title('Графік залежності середнього рейтингу аніме від кількості його жанрів')
 
 
 mng = plt.get_current_fig_manager()
